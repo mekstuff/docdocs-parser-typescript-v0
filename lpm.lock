@@ -1,0 +1,8 @@
+{
+  "pkgs": {
+    "@mekstuff/logreport": {
+      "resolve": "C:\\Users\\Lanzo\\.local-package-manager\\packages\\@mekstuff\\logreport\\pkg",
+      "dependencyScope": "dependency"
+    }
+  }
+}
