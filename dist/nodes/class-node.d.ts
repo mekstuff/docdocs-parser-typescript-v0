@@ -15,6 +15,8 @@ import { ISerializedSignature, ISerializedSymbol } from "../utils/main-serialize
 export interface ISerializedClassNode {
     constructors: ISerializedSignature[];
     members: ISerializedSymbol[];
+    inheritanceSymbol: ISerializedSymbol | undefined;
+    symbol: ISerializedSymbol;
 }
 /**
  * A Node for classes.
@@ -24,6 +26,10 @@ export declare class ClassNode {
     private Parser;
     private _checker;
     private _symbol;
+    /**
+     * Gets inheritance of the class.
+     */
+    private GetInheritanceSymbol;
     /**
      * Serializes the classes constructors.
      */

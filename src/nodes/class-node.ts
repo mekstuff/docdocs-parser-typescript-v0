@@ -1,17 +1,5 @@
-/**
- * Working on class node
- * Helpful links:
- * https://github.com/jordimarimon/ts-ast-parser/blob/main/packages/core/src/parse-from-files.ts
- * https://github.com/jordimarimon/ts-ast-parser/blob/main/packages/core/src/nodes/class-node.ts
- * https://github.com/jordimarimon/ts-ast-parser/blob/main/packages/core/src/utils/member.ts#L101
- * github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
- * stackoverflow.com/questions/58885433/typescript-compiler-how-to-get-an-exported-symbol-by-name
- * github.com/microsoft/TypeScript/wiki/Architectural-Overview
- * https://stackoverflow.com/questions/58886590/typescript-compiler-how-to-navigate-to-the-definition-of-a-symbol
- */
-
 import ts from "typescript";
-import LogReport from "@mekstuff/logreport";
+import { Console } from "@mekstuff/logreport";
 import { DocDocsParserTypescript } from "../index.js";
 import {
   ISerializedSignature,
@@ -23,6 +11,8 @@ import {
 export interface ISerializedClassNode {
   constructors: ISerializedSignature[];
   members: ISerializedSymbol[];
+  inheritanceSymbol: ISerializedSymbol | undefined;
+  symbol: ISerializedSymbol;
 }
 
 /**
@@ -33,11 +23,27 @@ export class ClassNode {
   private _symbol: ts.Symbol | undefined;
 
   /**
+   * Gets inheritance of the class.
+   */
+  private GetInheritanceSymbol(): ISerializedSymbol | undefined {
+    const Type = this._checker.getTypeAtLocation(this.Node);
+    const BaseType = Type.getBaseTypes()?.[0];
+    if (!BaseType) {
+      return undefined;
+    }
+    const SYMBOL = BaseType.getSymbol();
+    if (SYMBOL) {
+      return SerializeSymbol(SYMBOL, this._checker);
+    }
+    return undefined;
+  }
+
+  /**
    * Serializes the classes constructors.
    */
   private GetConstructors() {
     if (!this._symbol) {
-      LogReport.warn("No symbols for class node.");
+      Console.warn("No symbols for class node.");
       return [];
     }
     const constructorType = this._checker.getTypeOfSymbolAtLocation(
@@ -53,6 +59,7 @@ export class ClassNode {
    * Gets the properties/members of the class node.
    */
   private GetMembers() {
+    //TODO: if static member is included then it's not considered a member
     const symbol = this._checker.getTypeAtLocation(this.Node).getSymbol();
     const properties =
       (symbol &&
@@ -70,6 +77,8 @@ export class ClassNode {
     return {
       members: this.GetMembers(),
       constructors: this.GetConstructors(),
+      inheritanceSymbol: this.GetInheritanceSymbol(),
+      symbol: SerializeSymbol(this._symbol!, this._checker),
     };
   }
 
@@ -82,16 +91,11 @@ export class ClassNode {
     if (!Node.name) {
       return;
     }
+
     const symbol = typeChecker.getSymbolAtLocation(Node.name);
     if (!symbol) {
-      LogReport.warn(`Could not get symbol for class.`);
+      Console.warn(`Could not get symbol for class.`);
     }
     this._symbol = symbol;
-    // console.log(symbol);
-    // if (symbol) {
-    //   console.log("got symbol");
-    // } else {
-    //   console.log("no symbol");
-    // }
   }
 }

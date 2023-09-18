@@ -4,5 +4,6 @@
  * @tag Hello world
  */
 export declare class F {
-    private x;
+    private name;
+    constructor(name: string);
 }

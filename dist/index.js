@@ -1,9 +1,25 @@
 /* Made with ❤ By MekStuff */
 /* Compiles typescript into docdocs readable data */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import ts from "typescript";
 import path from "path";
-import LogReport from "@mekstuff/logreport";
+import { Console } from "@mekstuff/logreport";
 import { ModuleNode } from "./nodes/module-node.js";
+import { ClassNode } from "./nodes/class-node.js";
+export { ClassNode };
+export function GetParserVersion() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return "0.1.1";
+    });
+}
 export class DocDocsParserTypescript {
     resolveFilesPath(files) {
         const f = [];
@@ -31,8 +47,19 @@ export class DocDocsParserTypescript {
     /**
      * @param file If the file was edited/newly added, make sure to set reset `true`
      * @param reset Creates a new program with the file included if it's not.
+     *
+     * Wraps `parseSync` request in a promise that can run async
      */
     parse(file, reset) {
+        return new Promise((resolve, reject) => {
+            resolve(this.parseSync(file, reset));
+        });
+    }
+    /**
+     * @param file If the file was edited/newly added, make sure to set reset `true`
+     * @param reset Creates a new program with the file included if it's not.
+     */
+    parseSync(file, reset) {
         file = path.resolve(file);
         if (reset === true) {
             const oldProgram = this.program;
@@ -47,16 +74,15 @@ export class DocDocsParserTypescript {
         }
         const sourceFile = this.program.getSourceFile(file);
         if (sourceFile === undefined) {
-            LogReport.warn(`Could not get source from file => "${file}"`);
+            Console.warn(`Could not get source from file => "${file}"`);
             return;
         }
-        new ModuleNode(sourceFile, this);
+        return new ModuleNode(sourceFile, this);
     }
 }
-new DocDocsParserTypescript([
-    "C:/Users/Lanzo/Documents/Github/Mekstuff/docdocs-parser-typescript-v2/src/test.ts",
-]).parse("C:/Users/Lanzo/Documents/Github/Mekstuff/docdocs-parser-typescript-v2/src/test.ts");
-// new DocDocsParserTypescript().ParseFile(
-//   "C:/Users/Lanzo/Documents/Github/Mekstuff/docdocs-parser-typescript-v2/src/test.ts"
-// );
+// const FILE =
+//   "C:/Users/Lanzo/Documents/Github/Mekstuff/docdocs-parser-typescript-v2/src/test.ts";
+// const Parser = new DocDocsParserTypescript([FILE]);
+// const res = Parser.parseSync(FILE);
+// console.log(res?.Classes);
 //# sourceMappingURL=index.js.map

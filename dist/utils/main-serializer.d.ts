@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { JSDocTagNode } from "../nodes/jsdoc-tag-node.js";
 export interface ISerializedSignature {
     parameters: ISerializedSymbol[];
     documentation: string;
@@ -13,6 +14,18 @@ export interface ISerializedSymbol {
     name: string;
     documentation: string;
     type: string;
+    isMethod: boolean;
+    isProperty: boolean;
+    jsdoctags: JSDocTagNode[];
+    getModifierFlags: () => {
+        Public: boolean;
+        Private: boolean;
+        Abstract: boolean;
+        Static: boolean;
+        Optional: boolean;
+        Readonly: boolean;
+    };
+    _getSymbol: () => ts.Symbol;
 }
 /**
  * Serializes the symbol object.

@@ -3,9 +3,15 @@
 
 import ts from "typescript";
 import path from "path";
-import LogReport from "@mekstuff/logreport";
+import { Console } from "@mekstuff/logreport";
 import { ModuleNode } from "./nodes/module-node.js";
+import { ClassNode, ISerializedClassNode } from "./nodes/class-node.js";
 
+export { ClassNode, ISerializedClassNode };
+
+export async function GetParserVersion(): Promise<string> {
+  return "0.1.1";
+}
 export class DocDocsParserTypescript {
   public program: ts.Program;
   private files: string[] = [];
@@ -42,8 +48,19 @@ export class DocDocsParserTypescript {
   /**
    * @param file If the file was edited/newly added, make sure to set reset `true`
    * @param reset Creates a new program with the file included if it's not.
+   *
+   * Wraps `parseSync` request in a promise that can run async
    */
-  parse(file: string, reset?: boolean) {
+  parse(file: string, reset?: boolean): Promise<ModuleNode> {
+    return new Promise((resolve, reject) => {
+      resolve(this.parseSync(file, reset) as ModuleNode);
+    });
+  }
+  /**
+   * @param file If the file was edited/newly added, make sure to set reset `true`
+   * @param reset Creates a new program with the file included if it's not.
+   */
+  parseSync(file: string, reset?: boolean): ModuleNode | undefined {
     file = path.resolve(file);
     if (reset === true) {
       const oldProgram = this.program;
@@ -58,19 +75,17 @@ export class DocDocsParserTypescript {
     }
     const sourceFile = this.program.getSourceFile(file);
     if (sourceFile === undefined) {
-      LogReport.warn(`Could not get source from file => "${file}"`);
+      Console.warn(`Could not get source from file => "${file}"`);
       return;
     }
-    new ModuleNode(sourceFile, this);
+    return new ModuleNode(sourceFile, this);
   }
 }
+// const FILE =
+//   "C:/Users/Lanzo/Documents/Github/Mekstuff/docdocs-parser-typescript-v2/src/test.ts";
 
-new DocDocsParserTypescript([
-  "C:/Users/Lanzo/Documents/Github/Mekstuff/docdocs-parser-typescript-v2/src/test.ts",
-]).parse(
-  "C:/Users/Lanzo/Documents/Github/Mekstuff/docdocs-parser-typescript-v2/src/test.ts"
-);
+// const Parser = new DocDocsParserTypescript([FILE]);
 
-// new DocDocsParserTypescript().ParseFile(
-//   "C:/Users/Lanzo/Documents/Github/Mekstuff/docdocs-parser-typescript-v2/src/test.ts"
-// );
+// const res = Parser.parseSync(FILE);
+
+// console.log(res?.Classes);

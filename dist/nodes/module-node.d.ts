@@ -1,8 +1,8 @@
 import ts from "typescript";
 import { DocDocsParserTypescript } from "../index.js";
+import { ISerializedClassNode } from "./class-node.js";
 export declare class ModuleNode {
     private Parser;
-    private Classes;
-    private eachSourceFile;
+    Classes: ISerializedClassNode[];
     constructor(sourceFile: ts.SourceFile, Parser: DocDocsParserTypescript);
 }

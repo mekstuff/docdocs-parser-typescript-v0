@@ -1,1 +1,5 @@
-Version 1 interacted with the typescript compiler directly, Instead we switched to using [ts-ast-parser](https://github.com/jordimarimon/ts-ast-parser/tree/main) for a more complete version.
+> ** warning **
+> This version of DocDocs & the Parser are scrapped! This version is unfinished!
+>
+> DocDocs is being built from the ground up with better technology, this is pretty bad but is public for viewing sake ig?
+> Cloning & installing this repo will not work since it uses non-imported `lpm` packages.

@@ -1,27 +1,20 @@
 import ts from "typescript";
 import { DocDocsParserTypescript } from "../index.js";
-import { ClassNode } from "./class-node.js";
+import { ClassNode, ISerializedClassNode } from "./class-node.js";
 
 export class ModuleNode {
-  private Classes: ClassNode[] = [];
-  private eachSourceFile = (child: ts.Node) => {
-    if (ts.isClassDeclaration(child)) {
-      this.Classes.push(new ClassNode(child, this.Parser));
-    }
-  };
-
+  public Classes: ISerializedClassNode[] = [];
   constructor(
     sourceFile: ts.SourceFile,
     private Parser: DocDocsParserTypescript
   ) {
     if (!sourceFile.isDeclarationFile) {
       ts.forEachChild(sourceFile, (child) => {
-        this.eachSourceFile(child);
+        // this.eachSourceFile(child);
+        if (ts.isClassDeclaration(child)) {
+          this.Classes.push(new ClassNode(child, this.Parser).Serialize());
+        }
       });
     }
-
-    this.Classes.forEach((ClassNode) => {
-      console.log(ClassNode.Serialize());
-    });
   }
 }
